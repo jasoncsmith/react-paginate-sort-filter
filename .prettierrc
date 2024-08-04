@@ -1,0 +1,17 @@
+{
+  "printWidth": 110,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "arrowParens": "avoid",
+  "htmlWhitespaceSensitivity": "ignore",
+  "j_comment_on_htmlWhitespaceSensitivity": "// stops stupid </a wrap tag>",
+  "overrides": [
+    {
+      "files": "*.scss",
+      "options": {
+        "semi": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "name": "jasons-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": ".",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "test": "jest --watch",
+    "serve:localBuild": "node local-server/index.js",
+    "tailwind:build": "npx tailwindcss -i src/styles/tailwind/input.css -o src/styles/tailwind/output.css --minify",
+    "tailwind:watch": "npx tailwindcss -i src/styles/tailwind/input.css -o src/styles/tailwind/output.css --watch --minify"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "devDependencies": {
+    "@babel/preset-react": "^7.24.1",
+    "@faker-js/faker": "^8.4.1",
+    "@tanstack/eslint-plugin-query": "^5.28.11",
+    "@testing-library/jest-dom": "^6.4.5",
+    "@testing-library/react": "^15.0.6",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^29.5.12",
+    "@types/lodash": "^4.14.202",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.2.22",
+    "@types/react-pdf": "^6.2.0",
+    "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "babel-jest": "^29.7.0",
+    "browserslist-to-esbuild": "^2.1.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-jest": "^28.5.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vite-bundle-analyzer": "^0.9.4",
+    "vite-plugin-style-import": "^2.0.0"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.29.2",
+    "@tanstack/react-query-devtools": "^5.29.2",
+    "autoprefixer": "^10.4.14",
+    "axios": "^1.6.7",
+    "classnames": "2.5.1",
+    "dotenv": "^16.4.1",
+    "json-server": "0.17.3",
+    "lodash": "^4.17.21",
+    "path": "^0.12.7",
+    "postcss": "^8.4.38",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.11.2",
+    "sass": "^1.62.1",
+    "tailwindcss": "^3.3.2",
+    "ts-jest": "^29.1.2",
+    "url": "^0.11.3",
+    "uuid": "^9.0.0",
+    "zod": "^3.22.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
