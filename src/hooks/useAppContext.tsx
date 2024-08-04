@@ -5,6 +5,7 @@ enum ACTION_TYPES {
   'sort' = 'sort',
   'filter' = 'filter',
   'onload' = 'onload',
+  'recordsPerPage' = 'recordsPerPage',
 }
 
 type SortTypes = 'dateAsc' | 'dateDesc' | 'asc' | 'desc'
@@ -36,7 +37,12 @@ interface ActionOnload {
   payload: Employee[]
 }
 
-type Action = ActionFilter | ActionSort | ActionPaginate | ActionOnload
+interface ActionRecordsPerPage {
+  type: typeof ACTION_TYPES.recordsPerPage
+  payload: string
+}
+
+type Action = ActionFilter | ActionSort | ActionPaginate | ActionOnload | ActionRecordsPerPage
 
 interface State {
   records: Employee[]
@@ -79,6 +85,22 @@ function stateReducer(state: State, action: Action) {
 
   if (type === ACTION_TYPES.onload) {
     return { ...state, records: [...payload], totalPages: Math.ceil(payload.length / state.recordsPerPage) }
+  }
+
+  if (type === ACTION_TYPES.recordsPerPage) {
+    const val = Number(payload)
+    let num = state.recordsPerPage
+
+    if (val >= 1 && val <= state.records.length) {
+      num = val
+    }
+
+    return {
+      ...state,
+      currentPage: 1,
+      recordsPerPage: num,
+      totalPages: Math.ceil(state.records.length / num),
+    }
   }
 
   return state

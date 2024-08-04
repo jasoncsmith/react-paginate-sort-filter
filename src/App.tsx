@@ -129,8 +129,8 @@ const NumberOfRecordsDisplay = () => {
 
   return (
     <span>
-      Showing {currentPage * recordsPerPage - 4} - {currentPage * recordsPerPage} of {records.length}{' '}
-      {recordType}s
+      Showing {currentPage * recordsPerPage - (recordsPerPage - 1)} - {currentPage * recordsPerPage} of{' '}
+      {records.length} {recordType}s
     </span>
   )
 }
@@ -176,8 +176,21 @@ const NoResults = () => {
 const GridApi = ({ children }: { children: ReactNode }) => {
   return <div className="w-full">{children}</div>
 }
+
 type SortMethodHash = {
   [k in SortTypes]: (a: Employee, b: Employee) => number
+}
+
+const RecordsPerPageSelector = () => {
+  const { dispatch, recordsPerPage } = useGridApiContext()
+  return (
+    <input
+      type="text"
+      value={recordsPerPage}
+      onFocus={e => e.target.select()}
+      onChange={e => dispatch({ type: ACTION_TYPES.recordsPerPage, payload: e.target.value })}
+    />
+  )
 }
 
 const sortMethods: SortMethodHash = {
@@ -208,6 +221,7 @@ const Main = () => {
       <GridApi>
         <div className="flex justify-between py-4">
           <Filter />
+          <RecordsPerPageSelector />
           <Sort />
         </div>
         {items.length > 0 ? <Table items={dataToRender} /> : <NoResults />}
@@ -220,7 +234,7 @@ const Main = () => {
 const App = () => {
   return (
     <GridApiProvider>
-      <div className="app w-[1024px] mx-auto">
+      <div className="app max-w-[1024px] mx-auto">
         <Header />
         <Main />
       </div>
