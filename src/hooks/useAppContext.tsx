@@ -7,22 +7,13 @@ enum ACTION_TYPES {
   'onload' = 'onload',
 }
 
-type SortTypes = 'asc' | 'desc' | ''
+type SortTypes = 'dateAsc' | 'dateDesc' | 'asc' | 'desc'
 
 interface Employee {
   name: string
   email: string
   jobTitle: string
   dateStarted: Date
-}
-
-interface State {
-  records: Employee[]
-  currentPage: number
-  filter: string
-  sortSelection: SortTypes
-  recordsPerPage: number
-  dispatch: Dispatch<Action>
 }
 
 interface ActionPaginate {
@@ -47,14 +38,27 @@ interface ActionOnload {
 
 type Action = ActionFilter | ActionSort | ActionPaginate | ActionOnload
 
+interface State {
+  records: Employee[]
+  currentPage: number
+  filter: string
+  sortSelection: SortTypes
+  totalPages: number
+  recordsPerPage: number
+  recordType: string
+  dispatch: Dispatch<Action>
+}
+
 const GridApiContext = createContext<null | State>(null)
 
 const initialState: State = {
   records: [],
   currentPage: 1,
   filter: '',
-  sortSelection: '',
+  sortSelection: 'asc',
   recordsPerPage: 5,
+  recordType: 'Employee',
+  totalPages: 1,
   dispatch: () => {},
 }
 
@@ -66,15 +70,15 @@ function stateReducer(state: State, action: Action) {
   }
 
   if (type === ACTION_TYPES.sort) {
-    return { ...state, sortSelection: payload }
+    return { ...state, sortSelection: payload, currentPage: 1 }
   }
 
   if (type === ACTION_TYPES.filter) {
-    return { ...state, filter: payload }
+    return { ...state, filter: payload, currentPage: 1 }
   }
 
   if (type === ACTION_TYPES.onload) {
-    return { ...state, records: [...payload] }
+    return { ...state, records: [...payload], totalPages: Math.ceil(payload.length / state.recordsPerPage) }
   }
 
   return state
