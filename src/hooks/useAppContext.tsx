@@ -1,4 +1,4 @@
-import { createContext, Dispatch, ReactNode, Reducer, useContext, useReducer } from 'react'
+import { createContext, Dispatch, ReactNode, Reducer, useContext, useEffect, useReducer } from 'react'
 
 enum ACTION_TYPES {
   'paginate' = 'paginate',
@@ -32,7 +32,7 @@ interface ActionFilter {
   payload: string
 }
 
-interface ActionOnload {
+export interface ActionOnload {
   type: typeof ACTION_TYPES.onload
   payload: Employee[]
 }
@@ -46,6 +46,8 @@ type Action = ActionFilter | ActionSort | ActionPaginate | ActionOnload | Action
 
 interface State {
   records: Employee[]
+  numRecordsFiltered: number
+  recordsToRender: Employee[] // todo: make generic
   currentPage: number
   filter: string
   sortSelection: SortTypes
@@ -59,6 +61,8 @@ const GridApiContext = createContext<null | State>(null)
 
 const initialState: State = {
   records: [],
+  numRecordsFiltered: 0,
+  recordsToRender: [],
   currentPage: 1,
   filter: '',
   sortSelection: 'asc',
@@ -68,23 +72,84 @@ const initialState: State = {
   dispatch: () => {},
 }
 
+type SortMethodHash = {
+  [k in SortTypes]: (a: Employee, b: Employee) => number
+}
+
+const sortMethods: SortMethodHash = {
+  asc: (a: Employee, b: Employee) => a.name.localeCompare(b.name),
+  desc: (a: Employee, b: Employee) => b.name.localeCompare(a.name),
+  dateAsc: (a: Employee, b: Employee) =>
+    new Date(a.dateStarted).getTime() - new Date(b.dateStarted).getTime(),
+  dateDesc: (a: Employee, b: Employee) =>
+    new Date(b.dateStarted).getTime() - new Date(a.dateStarted).getTime(),
+}
+
+function getItems({ records, sortSelection, filter, currentPage, recordsPerPage }: State): {
+  recordsToRender: Employee[]
+  numRecordsFiltered: number
+} {
+  const items = records
+    .filter(r => r.name.toLowerCase().includes(filter.toLowerCase()))
+    .sort(sortMethods[sortSelection])
+
+  const recordsToRender = items.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage)
+
+  return { recordsToRender, numRecordsFiltered: items.length }
+}
+
 function stateReducer(state: State, action: Action) {
   const { type, payload } = action
 
   if (type === ACTION_TYPES.paginate) {
-    return { ...state, currentPage: payload }
+    if (payload < 1 || payload > state.totalPages) {
+      return state
+    }
+
+    const { recordsToRender, numRecordsFiltered } = getItems({ ...state, currentPage: payload })
+
+    return {
+      ...state,
+      currentPage: payload,
+      recordsToRender,
+      numRecordsFiltered,
+      totalPages: Math.ceil(numRecordsFiltered / state.recordsPerPage),
+    }
   }
 
   if (type === ACTION_TYPES.sort) {
-    return { ...state, sortSelection: payload, currentPage: 1 }
+    const { recordsToRender, numRecordsFiltered } = getItems({ ...state, sortSelection: payload })
+    return {
+      ...state,
+      sortSelection: payload,
+      recordsToRender,
+      currentPage: 1,
+      numRecordsFiltered,
+      totalPages: Math.ceil(numRecordsFiltered / state.recordsPerPage),
+    }
   }
 
   if (type === ACTION_TYPES.filter) {
-    return { ...state, filter: payload, currentPage: 1 }
+    const { recordsToRender, numRecordsFiltered } = getItems({ ...state, filter: payload })
+    return {
+      ...state,
+      filter: payload,
+      recordsToRender,
+      currentPage: 1,
+      numRecordsFiltered,
+      totalPages: Math.ceil(numRecordsFiltered / state.recordsPerPage),
+    }
   }
 
   if (type === ACTION_TYPES.onload) {
-    return { ...state, records: [...payload], totalPages: Math.ceil(payload.length / state.recordsPerPage) }
+    const { recordsToRender, numRecordsFiltered } = getItems({ ...state, records: [...payload] })
+    return {
+      ...state,
+      records: [...payload],
+      numRecordsFiltered,
+      totalPages: Math.ceil(numRecordsFiltered / state.recordsPerPage),
+      recordsToRender,
+    }
   }
 
   if (type === ACTION_TYPES.recordsPerPage) {
@@ -95,19 +160,44 @@ function stateReducer(state: State, action: Action) {
       num = val
     }
 
+    const { recordsToRender, numRecordsFiltered } = getItems({ ...state, recordsPerPage: num })
+
     return {
       ...state,
+      recordsToRender,
       currentPage: 1,
       recordsPerPage: num,
-      totalPages: Math.ceil(state.records.length / num),
+      numRecordsFiltered,
+      totalPages: Math.ceil(numRecordsFiltered / num),
     }
   }
 
   return state
 }
 
-const GridApiProvider = ({ children }: { children: ReactNode }) => {
-  const [appState, dispatch] = useReducer<Reducer<State, Action>>(stateReducer, initialState)
+const GridApiProvider = ({
+  children,
+  defaultRecordsPerPage,
+  type,
+  fetcher,
+  defaultSort,
+}: {
+  children: ReactNode
+  defaultRecordsPerPage: number
+  type: string
+  fetcher: () => Employee[]
+  defaultSort: SortTypes
+}) => {
+  const [appState, dispatch] = useReducer<Reducer<State, Action>>(stateReducer, {
+    ...initialState,
+    recordsPerPage: defaultRecordsPerPage,
+    recordType: type,
+    sortSelection: defaultSort,
+  })
+
+  useEffect(() => {
+    dispatch({ type: ACTION_TYPES.onload, payload: fetcher() })
+  }, [])
 
   return <GridApiContext.Provider value={{ ...appState, dispatch }}>{children}</GridApiContext.Provider>
 }
