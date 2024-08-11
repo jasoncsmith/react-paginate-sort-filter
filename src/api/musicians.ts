@@ -16,9 +16,10 @@ export const getMusicians = (count = 150) => {
       fullName: faker.person.fullName(),
       genre: faker.music.genre(),
       groupName: faker.music.songName(),
-      yearsActive: faker.number.int(),
-      numAlbums: faker.number.int(),
+      yearsActive: faker.number.int({ min: 1, max: 38 }),
+      numAlbums: faker.number.int({ min: 1, max: 99 }),
     })
   }
+
   return arr
 }
