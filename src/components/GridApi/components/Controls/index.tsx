@@ -2,14 +2,14 @@ import { ChangeEvent } from 'react'
 import { ACTION_TYPES, SortTypes, useGridApiContext } from '../../../../hooks/useGridApiContext'
 
 const Filter = () => {
-  const { dispatch, filter } = useGridApiContext()
+  const { dispatch, filterValue } = useGridApiContext()
 
   return (
     <span className="relative inline-block">
       <input
         className="text-black p-4"
         type="text"
-        value={filter}
+        value={filterValue}
         placeholder="Search records"
         onChange={e => dispatch({ type: ACTION_TYPES.filter, payload: e.target.value })}
       />

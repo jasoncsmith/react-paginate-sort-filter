@@ -1,5 +1,6 @@
 import { createContext, Dispatch, ReactNode, Reducer, useContext, useEffect, useReducer } from 'react'
 import { Employee, sortMethods } from '../api/employees'
+import { GridApiProps } from '../components/GridApi'
 
 enum ACTION_TYPES {
   'paginate' = 'paginate',
@@ -43,12 +44,13 @@ interface State {
   numRecordsFiltered: number
   recordsToRender: Employee[] // todo: make generic
   currentPage: number
-  filter: string
+  filterValue: string
   sortSelection: SortTypes
   totalPages: number
   recordsPerPage: number
   recordType: string
   dispatch: Dispatch<Action>
+  fields: object
 }
 
 const GridApiContext = createContext<null | State>(null)
@@ -58,21 +60,31 @@ const initialState: State = {
   numRecordsFiltered: 0,
   recordsToRender: [],
   currentPage: 1,
-  filter: '',
+  filterValue: '',
   sortSelection: 'asc',
   recordsPerPage: 5,
   recordType: 'Employee',
   totalPages: 1,
   dispatch: () => {},
+  fields: {},
 }
 
-function getItems({ records, sortSelection, filter, currentPage, recordsPerPage }: State): {
+function getItems({ records, sortSelection, fields, filterValue, currentPage, recordsPerPage }: State): {
   recordsToRender: Employee[]
   numRecordsFiltered: number
 } {
-  const items = records
-    .filter(r => r.name.toLowerCase().includes(filter.toLowerCase()))
-    .sort(sortMethods[sortSelection])
+  const lowerFilterValue = filterValue.trim().toLowerCase()
+
+  const items =
+    lowerFilterValue === ''
+      ? records
+      : records
+          .filter(record => {
+            return Object.keys(fields)
+              .map(field => record[field])
+              .some(val => String(val).toLowerCase().includes(lowerFilterValue))
+          })
+          .sort(sortMethods[sortSelection])
 
   const recordsToRender = items.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage)
 
@@ -111,10 +123,10 @@ function stateReducer(state: State, action: Action) {
   }
 
   if (type === ACTION_TYPES.filter) {
-    const { recordsToRender, numRecordsFiltered } = getItems({ ...state, filter: payload })
+    const { recordsToRender, numRecordsFiltered } = getItems({ ...state, filterValue: payload })
     return {
       ...state,
-      filter: payload,
+      filterValue: payload,
       recordsToRender,
       currentPage: 1,
       numRecordsFiltered,
@@ -155,25 +167,24 @@ function stateReducer(state: State, action: Action) {
 
   return state
 }
+export interface GridApiProviderProps extends GridApiProps {
+  children: ReactNode
+}
 
 const GridApiProvider = ({
   children,
   defaultRecordsPerPage,
-  type,
+  recordType,
   fetcher,
   defaultSort,
-}: {
-  children: ReactNode
-  defaultRecordsPerPage: number
-  type: string
-  fetcher: () => Employee[]
-  defaultSort: SortTypes
-}) => {
+  fields,
+}: GridApiProviderProps) => {
   const [appState, dispatch] = useReducer<Reducer<State, Action>>(stateReducer, {
     ...initialState,
     recordsPerPage: defaultRecordsPerPage,
-    recordType: type,
+    recordType,
     sortSelection: defaultSort,
+    fields,
   })
 
   useEffect(() => {

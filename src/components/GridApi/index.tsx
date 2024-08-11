@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Employee, GridApiProvider, SortTypes } from '../../hooks/useGridApiContext'
+import { Employee, GridApiProvider, GridApiProviderProps, SortTypes } from '../../hooks/useGridApiContext'
 
 import { Filter, NumberOfRecordsDisplay, RecordsPerPageSelector, Sort } from './components/Controls'
 import Pagination from './components/Pagination'
@@ -13,20 +13,22 @@ const Controls = ({ children }: { children: ReactNode }) => {
   return <div className="w-full flex justify-between py-4">{children}</div>
 }
 
-interface GridApiProps {
-  fetcher: () => Employee[]
+export interface GridApiProps {
+  defaultRecordsPerPage: number
   recordType: string
-  recordsPerPage: number
+  fetcher: any //() => Employee[] // TODO: find a way to implement generic
   defaultSort: SortTypes
+  fields: object
 }
 
-const GridApi = ({ fetcher, recordType, recordsPerPage, defaultSort }: GridApiProps) => {
+const GridApi = ({ fetcher, recordType, defaultRecordsPerPage, defaultSort, fields }: GridApiProps) => {
   return (
     <GridApiProvider
       fetcher={fetcher}
-      type={recordType}
-      defaultRecordsPerPage={recordsPerPage}
+      recordType={recordType}
+      defaultRecordsPerPage={defaultRecordsPerPage}
       defaultSort={defaultSort}
+      fields={fields}
     >
       <GridWrap>
         <Controls>

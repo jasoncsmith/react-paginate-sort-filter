@@ -1,5 +1,6 @@
 import GridApi from './components/GridApi'
 import { getEmployees } from './api/employees'
+import { getMusicians } from './api/musicians'
 
 const Header = () => {
   return (
@@ -12,8 +13,31 @@ const Header = () => {
 const Main = () => {
   return (
     <main className={'min-w-96 mx-auto p-6 flex gap-4 flex-wrap'}>
-      <GridApi fetcher={getEmployees} recordType="Employee" recordsPerPage={5} defaultSort="asc" />
-      <GridApi fetcher={getEmployees} recordType="Narko" recordsPerPage={3} defaultSort="dateAsc" />
+      <GridApi
+        fields={{
+          fullName: 'string',
+          email: 'string',
+          jobTitle: 'string',
+          dateStarted: 'Date',
+        }}
+        fetcher={getEmployees}
+        recordType="Employee"
+        defaultRecordsPerPage={5}
+        defaultSort="asc"
+      />
+      <GridApi
+        fields={{
+          genre: 'string',
+          numAlbums: 'number',
+          fullName: 'string',
+          groupName: 'string',
+          yearsActive: 'number',
+        }}
+        fetcher={getMusicians}
+        recordType="Musicians"
+        defaultRecordsPerPage={3}
+        defaultSort="asc"
+      />
     </main>
   )
 }
