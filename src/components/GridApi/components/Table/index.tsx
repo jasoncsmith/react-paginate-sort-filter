@@ -1,4 +1,4 @@
-import { useGridApiContext } from '../../hooks/useAppContext'
+import { useGridApiContext } from '../../../../hooks/useGridApiContext'
 import NoResults from '../NoResults'
 
 const Table = () => {

@@ -1,4 +1,4 @@
-import { ACTION_TYPES, useGridApiContext } from '../../hooks/useAppContext'
+import { ACTION_TYPES, useGridApiContext } from '../../../../hooks/useGridApiContext'
 import { PageSelect } from '../Controls'
 
 const Pagination = () => {

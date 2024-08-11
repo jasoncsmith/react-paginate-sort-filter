@@ -1,9 +1,9 @@
 import { ReactNode } from 'react'
-import { Employee, GridApiProvider, SortTypes } from '../../hooks/useAppContext'
+import { Employee, GridApiProvider, SortTypes } from '../../hooks/useGridApiContext'
 
-import { Filter, NumberOfRecordsDisplay, RecordsPerPageSelector, Sort } from '../Controls'
-import Pagination from '../Pagination'
-import Table from '../Table'
+import { Filter, NumberOfRecordsDisplay, RecordsPerPageSelector, Sort } from './components/Controls'
+import Pagination from './components/Pagination'
+import Table from './components/Table'
 
 const GridWrap = ({ children }: { children: ReactNode }) => {
   return <div className="w-full p-4">{children}</div>

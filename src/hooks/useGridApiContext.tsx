@@ -1,4 +1,5 @@
 import { createContext, Dispatch, ReactNode, Reducer, useContext, useEffect, useReducer } from 'react'
+import { Employee, sortMethods } from '../api/employees'
 
 enum ACTION_TYPES {
   'paginate' = 'paginate',
@@ -9,13 +10,6 @@ enum ACTION_TYPES {
 }
 
 type SortTypes = 'dateAsc' | 'dateDesc' | 'asc' | 'desc'
-
-interface Employee {
-  name: string
-  email: string
-  jobTitle: string
-  dateStarted: Date
-}
 
 interface ActionPaginate {
   type: typeof ACTION_TYPES.paginate
@@ -70,19 +64,6 @@ const initialState: State = {
   recordType: 'Employee',
   totalPages: 1,
   dispatch: () => {},
-}
-
-type SortMethodHash = {
-  [k in SortTypes]: (a: Employee, b: Employee) => number
-}
-
-const sortMethods: SortMethodHash = {
-  asc: (a: Employee, b: Employee) => a.name.localeCompare(b.name),
-  desc: (a: Employee, b: Employee) => b.name.localeCompare(a.name),
-  dateAsc: (a: Employee, b: Employee) =>
-    new Date(a.dateStarted).getTime() - new Date(b.dateStarted).getTime(),
-  dateDesc: (a: Employee, b: Employee) =>
-    new Date(b.dateStarted).getTime() - new Date(a.dateStarted).getTime(),
 }
 
 function getItems({ records, sortSelection, filter, currentPage, recordsPerPage }: State): {

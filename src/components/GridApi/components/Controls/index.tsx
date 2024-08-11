@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react'
-import { ACTION_TYPES, SortTypes, useGridApiContext } from '../../hooks/useAppContext'
+import { ACTION_TYPES, SortTypes, useGridApiContext } from '../../../../hooks/useGridApiContext'
 
 const Filter = () => {
   const { dispatch, filter } = useGridApiContext()
